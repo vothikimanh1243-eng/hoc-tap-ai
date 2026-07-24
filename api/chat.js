@@ -1,32 +1,31 @@
-async function sendMessage() {
-    const inputField = document.getElementById('userInput');
-    const messageContainer = document.getElementById('chatMessages');
-    const userText = inputField.value.trim();
+export default async function handler(req, res) {
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
 
-    if (!userText) return;
-
-    messageContainer.innerHTML += `<div class="message user-msg">${userText}</div>`;
-    inputField.value = '';
-    messageContainer.scrollTop = messageContainer.scrollHeight;
-
-    const loadingId = 'loading_' + Date.now();
-    messageContainer.innerHTML += `<div class="message ai-msg" id="${loadingId}">AI đang suy nghĩ...</div>`;
-    messageContainer.scrollTop = messageContainer.scrollHeight;
+    const { message } = req.body;
 
     try {
-        const response = await fetch('/api/chat', {
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: userText })
+            headers: {
+                'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: "llama-3.3-70b-versatile",
+                messages: [
+                    { role: "system", content: "Bạn là trợ lý AI thân thiện hỗ trợ học tập." },
+                    { role: "user", content: message }
+                ]
+            })
         });
 
         const data = await response.json();
-        document.getElementById(loadingId).remove();
-        messageContainer.innerHTML += `<div class="message ai-msg">${data.reply || data.error}</div>`;
-    } catch (error) {
-        document.getElementById(loadingId).remove();
-        messageContainer.innerHTML += `<div class="message ai-msg">Lỗi kết nối tới server!</div>`;
-    }
+        const reply = data.choices && data.choices[0] ? data.choices[0].message.content : "Không có phản hồi từ AI.";
 
-    messageContainer.scrollTop = messageContainer.scrollHeight;
+        return res.status(200).json({ reply });
+    } catch (error) {
+        return res.status(500).json({ error: 'Lỗi kết nối tới AI' });
+    }
 }
