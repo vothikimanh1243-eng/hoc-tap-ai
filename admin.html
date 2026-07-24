@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Quản Trị Admin</title>
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #131b2e;
+            --accent-purple: #8b5cf6;
+            --accent-hover: #7c3aed;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: var(--bg-primary); color: var(--text-main); padding: 30px; display: flex; justify-content: center; }
+        .box { background: var(--bg-secondary); padding: 25px; border-radius: 12px; max-width: 600px; width: 100%; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { margin-bottom: 15px; font-size: 20px; }
+        input, button { width: 100%; padding: 12px; margin-top: 12px; border-radius: 6px; border: 1px solid var(--border-color); background: #1e293b; color: #fff; outline: none; font-size: 14px; }
+        button { background: var(--accent-purple); font-weight: bold; cursor: pointer; }
+        button:hover { background: var(--accent-hover); }
+        .hidden { display: none; }
+        .sim-item { background: #1e293b; padding: 12px; margin-top: 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-color); }
+        .btn-delete { width: auto; background: #ef4444; padding: 6px 12px; margin: 0; font-size: 12px; }
+        .btn-delete:hover { background: #dc2626; }
+        .back-link { display: inline-block; margin-top: 20px; color: var(--text-muted); text-decoration: none; font-size: 14px; }
+        .back-link:hover { color: #fff; }
+    </style>
+</head>
+<body>
+
+    <!-- Đăng nhập Admin -->
+    <div class="box" id="loginBox">
+        <h2>🔒 Đăng Nhập Quản Trị</h2>
+        <input type="password" id="adminPass" placeholder="Nhập mật khẩu (Mặc định: 123)..." onkeypress="handleLoginKey(event)">
+        <button onclick="checkLogin()">Đăng Nhập</button>
+        <br><a href="index.html" class="back-link">← Quay lại trang chủ học sinh</a>
+    </div>
+
+    <!-- Bảng điều khiển Admin -->
+    <div class="box hidden" id="adminDashboard">
+        <h2>⚙️ Quản Lý Bài Mô Phỏng</h2>
+        <input type="text" id="simTitle" placeholder="Tên bài mô phỏng">
+        <input type="text" id="simDesc" placeholder="Mô tả ngắn">
+        <input type="text" id="simUrl" placeholder="Đường dẫn (URL)">
+        <button onclick="addSimulation()">Thêm bài học mới</button>
+        
+        <h2 style="margin-top: 25px;">Danh sách hiện tại:</h2>
+        <div id="adminSimList"></div>
+        <a href="index.html" class="back-link">← Xem trang học sinh</a>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = "06082010@"; // Bạn có thể đổi mật khẩu tại đây
+
+        function checkLogin() {
+            const pass = document.getElementById('adminPass').value;
+            if(pass === ADMIN_PASSWORD) {
+                document.getElementById('loginBox').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                loadAdminSims();
+            } else {
+                alert("Sai mật khẩu!");
+            }
+        }
+        function handleLoginKey(e) { if(e.key === 'Enter') checkLogin(); }
+
+        function loadAdminSims() {
+            let defaultSims = [
+                { title: "Hệ mặt trời", desc: "Mô phỏng hệ mặt trời 3D", url: "#" },
+                { title: "Hóa Học", desc: "Thí nghiệm hóa học ảo", url: "#" }
+            ];
+            let sims = JSON.parse(localStorage.getItem('saved_simulations')) || defaultSims;
+            const listDiv = document.getElementById('adminSimList');
+            listDiv.innerHTML = "";
+            sims.forEach((sim, index) => {
+                listDiv.innerHTML += `
+                    <div class="sim-item">
+                        <div><strong>${sim.title}</strong><br><small style="color:var(--text-muted);">${sim.desc}</small></div>
+                        <button class="btn-delete" onclick="deleteSim(${index})">Xóa</button>
+                    </div>
+                `;
+            });
+        }
+
+        function addSimulation() {
+            let title = document.getElementById('simTitle').value;
+            let desc = document.getElementById('simDesc').value;
+            let url = document.getElementById('simUrl').value;
+
+            if(!title || !url) {
+                alert("Vui lòng nhập tên và đường dẫn!");
+                return;
+            }
+
+            let defaultSims = [{ title: "Hệ mặt trời", desc: "Mô phỏng hệ mặt trời 3D", url: "#" }, { title: "Hóa Học", desc: "Thí nghiệm hóa học ảo", url: "#" }];
+            let sims = JSON.parse(localStorage.getItem('saved_simulations')) || defaultSims;
+            sims.push({ title, desc, url });
+            localStorage.setItem('saved_simulations', JSON.stringify(sims));
+
+            document.getElementById('simTitle').value = "";
+            document.getElementById('simDesc').value = "";
+            document.getElementById('simUrl').value = "";
+            loadAdminSims();
+            alert("Thêm thành công!");
+        }
+
+        function deleteSim(index) {
+            let defaultSims = [{ title: "Hệ mặt trời", desc: "Mô phỏng hệ mặt trời 3D", url: "#" }, { title: "Hóa Học", desc: "Thí nghiệm hóa học ảo", url: "#" }];
+            let sims = JSON.parse(localStorage.getItem('saved_simulations')) || defaultSims;
+            sims.splice(index, 1);
+            localStorage.setItem('saved_simulations', JSON.stringify(sims));
+            loadAdminSims();
+        }
+    </script>
+</body>
+</html>
