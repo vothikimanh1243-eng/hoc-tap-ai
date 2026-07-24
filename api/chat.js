@@ -1,23 +1,32 @@
-import Groq from "groq-sdk";
+async function sendMessage() {
+    const inputField = document.getElementById('userInput');
+    const messageContainer = document.getElementById('chatMessages');
+    const userText = inputField.value.trim();
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    if (!userText) return;
 
-export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
-    }
+    messageContainer.innerHTML += `<div class="message user-msg">${userText}</div>`;
+    inputField.value = '';
+    messageContainer.scrollTop = messageContainer.scrollHeight;
+
+    const loadingId = 'loading_' + Date.now();
+    messageContainer.innerHTML += `<div class="message ai-msg" id="${loadingId}">AI đang suy nghĩ...</div>`;
+    messageContainer.scrollTop = messageContainer.scrollHeight;
 
     try {
-        const { message } = req.body;
-        
-        const chatCompletion = await groq.chat.completions.create({
-            messages: [{ role: "user", content: message }],
-            model: "llama-3.3-70b-versatile",
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: userText })
         });
 
-        const reply = chatCompletion.choices[0]?.message?.content || "Không có phản hồi từ AI.";
-        return res.status(200).json({ reply });
+        const data = await response.json();
+        document.getElementById(loadingId).remove();
+        messageContainer.innerHTML += `<div class="message ai-msg">${data.reply || data.error}</div>`;
     } catch (error) {
-        return res.status(500).json({ error: "Lỗi từ máy chủ AI." });
+        document.getElementById(loadingId).remove();
+        messageContainer.innerHTML += `<div class="message ai-msg">Lỗi kết nối tới server!</div>`;
     }
+
+    messageContainer.scrollTop = messageContainer.scrollHeight;
 }
