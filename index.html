@@ -3,222 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Học Tập & Mô Phỏng AI</title>
+    <title>Hệ Thống Mô Phỏng Học Tập & Quản Trị Bảo Mật</title>
     <style>
         :root {
             --bg-primary: #0b0f19;
             --bg-secondary: #131b2e;
             --accent-purple: #8b5cf6;
             --accent-hover: #7c3aed;
-            --accent-red: #ef4444;
-            --accent-red-hover: #dc2626;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --border-color: #334155;
+            --danger: #ef4444;
+            --warning: #f59e0b;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background-color: var(--bg-primary); color: var(--text-main); padding: 20px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+        body { background-color: var(--bg-primary); color: var(--text-main); padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
         
-        .container { max-width: 800px; width: 100%; margin-top: 20px; }
-        .section-title { font-size: 22px; font-weight: bold; margin-bottom: 20px; text-align: center; }
+        .container { max-width: 950px; width: 100%; display: flex; flex-direction: column; gap: 20px; }
+        .card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
         
-        .card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .card-info h3 { font-size: 18px; margin-bottom: 5px; }
-        .card-info p { color: var(--text-muted); font-size: 14px; }
+        h1, h2, h3 { color: #fff; display: flex; align-items: center; gap: 10px; }
         
-        .btn { background: var(--accent-purple); color: #fff; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; border: none; cursor: pointer; }
-        .btn:hover { background: var(--accent-hover); }
+        .nav-bar { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: 15px 20px; border-radius: 12px; border: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px; }
+        .nav-bar button { background: var(--accent-purple); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .nav-bar button:hover { background: var(--accent-hover); }
 
-        .btn-danger { background: var(--accent-red); padding: 8px 12px; font-size: 13px; }
-        .btn-danger:hover { background: var(--accent-red-hover); }
-
-        /* Khung Chat AI */
-        .ai-chat-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-top: 30px; }
-        .chat-messages { height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 15px; background: #0b0f19; font-size: 14px; display: flex; flex-direction: column; gap: 8px; }
-        .message { padding: 8px 12px; border-radius: 6px; max-width: 80%; line-height: 1.4; }
-        .user-msg { background: var(--accent-purple); color: white; align-self: flex-end; }
-        .ai-msg { background: #1e293b; color: var(--text-main); align-self: flex-start; }
-        .chat-input-area { display: flex; gap: 10px; }
-        .chat-input-area input { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: #1e293b; color: #fff; outline: none; }
-
-        /* Giao diện Quản trị ẩn/hiện */
-        #adminView { display: none; background: var(--bg-secondary); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); width: 100%; max-width: 700px; margin-top: 20px; }
-        #adminView h2 { margin-bottom: 15px; font-size: 20px; }
-        #adminView input { width: 100%; padding: 12px; margin-top: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid var(--border-color); background: #1e293b; color: #fff; outline: none; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px; }
         
-        .admin-item { display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 12px; border-radius: 6px; margin-bottom: 10px; border: 1px solid var(--border-color); }
+        input, textarea, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: #1e293b; color: #fff; outline: none; }
+        
+        .btn-danger { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+        .btn-danger:hover { opacity: 0.8; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+        th, td { border: 1px solid var(--border-color); padding: 10px; text-align: left; font-size: 14px; }
+        th { background: #1e293b; color: #38bdf8; }
 
-        /* Nút Quản trị ở góc phải */
-        .admin-trigger { position: fixed; bottom: 10px; right: 10px; color: var(--text-muted); font-size: 12px; text-decoration: none; background: var(--bg-secondary); padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); cursor: pointer; }
-        .admin-trigger:hover { color: #fff; }
+        .chat-box { background: #0b0f19; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .chat-msg { padding: 10px; border-radius: 6px; max-width: 80%; font-size: 14px; }
+        .chat-bot { background: #1e293b; align-self: flex-start; color: #fff; }
+        .chat-user { background: var(--accent-purple); align-self: flex-end; color: #fff; }
+
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <!-- PHẦN TRANG CHỦ -->
-    <div id="homeView" class="container">
-        <h1 class="section-title">🚀 Danh Sách Bài Mô Phỏng</h1>
-        
-        <!-- Danh sách bài học sẽ được render tự động ở đây -->
-        <div id="simListContainer"></div>
-
-        <!-- KHUNG CHAT AI -->
-        <div class="ai-chat-box">
-            <h3 style="margin-bottom: 12px; font-size: 18px;">🤖 Trợ Lý AI Học Tập</h3>
-            <div class="chat-messages" id="chatMessages">
-                <div class="message ai-msg">Xin chào! Mình có thể hỗ trợ gì cho bạn về các bài mô phỏng trên web?</div>
+    <div class="container">
+        <!-- THANH ĐIỀU HƯỚNG -->
+        <div class="nav-bar">
+            <div>
+                <label style="font-size: 13px; color: var(--text-muted);">Email của bạn:</label>
+                <input type="email" id="currentUserEmail" value="hocsinh@gmail.com" style="width: 200px; display: inline-block; padding: 5px 10px; margin-left: 5px;">
             </div>
-            <div class="chat-input-area">
-                <input type="text" id="userInput" placeholder="Nhập câu hỏi cho AI..." onkeypress="handleKeyPress(event)">
-                <button class="btn" onclick="sendMessage()">Gửi</button>
+            <div>
+                <button onclick="switchView('student')">Trang Học Sinh</button>
+                <button onclick="checkAdminPassword()">Trang Quản Trị (Admin)</button>
+            </div>
+        </div>
+
+        <!-- 1. GIAO DIỆN HỌC SINH -->
+        <div id="studentView" class="container" style="gap: 20px;">
+            <div class="card">
+                <h2>🚀 Danh Sách Bài Mô Phỏng</h2>
+                <div id="studentModuleList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            </div>
+
+            <!-- TRỢ LÝ AI HỌC TẬP -->
+            <div class="card">
+                <h2>🤖 Trợ Lý AI Học Tập</h2>
+                <div class="chat-box" id="chatContainer">
+                    <div class="chat-msg chat-bot">Xin chào! Mình có thể hỗ trợ gì cho bạn về các bài mô phỏng trên web?</div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="chatInput" placeholder="Nhập câu hỏi cho AI..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
+                    <button onclick="sendChatMessage()" style="background: var(--accent-purple); color: white; border: none; padding: 0 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">Gửi</button>
+                </div>
+            </div>
+
+            <!-- PHẦN GỬI KHIẾU NẠI -->
+            <div class="card" style="border-color: var(--warning);">
+                <h3 style="color: var(--warning);">⚠️ Gửi Khiếu Nại / Báo Lỗi Bài Học</h3>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <input type="text" id="complaintName" placeholder="Họ và tên của bạn..." value="Nguyễn Văn Học Sinh">
+                    <textarea id="complaintContent" rows="3" placeholder="Nhập nội dung khiếu nại, báo lỗi bài mô phỏng hoặc thắc mắc..."></textarea>
+                    <button onclick="submitComplaint()" style="background: var(--warning); color: #000; font-weight: bold; border: none; padding: 10px; border-radius: 6px; cursor: pointer;">Gửi Khiếu Nại</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. GIAO DIỆN QUẢN TRỊ (ADMIN) -->
+        <div id="adminView" class="container hidden" style="gap: 20px;">
+            <div class="card">
+                <h2>⚙️ Trang Quản Trị Bài Mô Phỏng</h2>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <label>Tên bài mô phỏng:</label>
+                    <input type="text" id="newTitle" placeholder="Ví dụ: Vật Lý - Con Lắc Đơn">
+                    <label>Đường dẫn (Link):</label>
+                    <input type="text" id="newLink" placeholder="Ví dụ: vat-ly.html">
+                    <button onclick="addModule()" style="background: var(--accent-purple); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold;">Thêm bài học mới</button>
+                </div>
+                <h3 style="margin-top: 10px;">Danh sách bài hiện có:</h3>
+                <div id="adminModuleList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            </div>
+
+            <!-- PHẦN SỐ 1: XEM KHIẾU NẠI CỦA HỌC SINH -->
+            <div class="card" style="border-color: var(--warning);">
+                <h3 style="color: var(--warning);">📋 Số 1: Xem Khiếu Nại Của Học Sinh</h3>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Thời gian</th>
+                                <th>Học sinh</th>
+                                <th>Email</th>
+                                <th>Nội dung khiếu nại</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="complaintTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PHẦN SỐ 2: THỜI GIAN & EMAIL TRUY CẬP -->
+            <div class="card" style="border-color: #38bdf8;">
+                <h3 style="color: #38bdf8;">📊 Số 2: Lịch Sử Thời Gian & Email Học Sinh Truy Cập</h3>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Thời gian truy cập</th>
+                                <th>Email học sinh</th>
+                                <th>Bài mô phỏng đã truy cập</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accessLogTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- PHẦN TRANG QUẢN TRỊ (ẨN LÚC ĐẦU) -->
-    <div id="adminView">
-        <h2>🚀 Trang Quản Trị Bài Mô Phỏng</h2>
-        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">Thêm mới hoặc xóa bớt các bài mô phỏng.</p>
-        
-        <label>Tên bài mô phỏng:</label>
-        <input type="text" id="simName" placeholder="Ví dụ: Vật Lý - Con Lắc Đơn">
-        
-        <label>Đường dẫn (Link):</label>
-        <input type="text" id="simLink" placeholder="Ví dụ: vat-ly.html">
-        
-        <button class="btn" style="width: 100%;" onclick="addSimulation()">Thêm bài học mới</button>
-
-        <h3 style="margin-top: 25px; margin-bottom: 15px; font-size: 16px;">Danh sách bài hiện có:</h3>
-        <div id="adminListContainer"></div>
-        
-        <br>
-        <a href="#" onclick="showHome(event)" style="color: var(--text-muted); text-decoration: none; font-size: 14px;">← Quay lại trang chủ học sinh</a>
-    </div>
-
-    <!-- NÚT BẤM CHUYỂN QUA LẠI QUẢN TRỊ -->
-    <a class="admin-trigger" onclick="showAdmin(event)">⚙️ Quản Trị</a>
-
     <script>
-        const ADMIN_PASSWORD = "682010@?"; // Mật khẩu quản trị viên
+        const ADMIN_PASSWORD = "682010@?"; // Mật khẩu quản trị mặc định
 
-        // Dữ liệu mẫu ban đầu (sẽ lưu vào trình duyệt)
-        let simulations = JSON.parse(localStorage.getItem('simulations')) || [
-            { name: "Hệ mặt trời", desc: "Mô phỏng hệ mặt trời 3D", link: "#" },
-            { name: "Hóa Học", desc: "Thí nghiệm hóa học ảo", link: "#" }
+        let modules = [
+            { title: "HỆ MẶT TRỜI MÔ PHỎNG", link: "https://vothikimanh1243-eng.github.io/h-n-t-tr-i/" },
+            { title: "HOÁ HỌC MÔ PHỎNG PHA CHẾ", link: "https://vothikimanh1243-eng.github.io/hoa-hoc/" },
+            { title: "LÒ PHẢN ỨNG HẠT NHÂN MÔ PHỎNG", link: "https://vothikimanh1243-eng.github.io/l-ph-n-ng/" },
+            { title: "TOÁN HÌNH", link: "https://vothikimanh1243-eng.github.io/toan/" }
         ];
 
-        function renderSimulations() {
-            // Render trang chủ
-            const homeContainer = document.getElementById('simListContainer');
-            homeContainer.innerHTML = '';
-            simulations.forEach(sim => {
-                homeContainer.innerHTML += `
-                    <div class="card">
-                        <div class="card-info">
-                            <h3>${sim.name}</h3>
-                            <p>${sim.desc}</p>
-                        </div>
-                        <a href="${sim.link}" class="btn">Truy cập ngay</a>
-                    </div>
-                `;
-            });
+        let complaints = [
+            { time: "24/07/2026 15:30:00", name: "Nguyễn Văn A", email: "vana@gmail.com", content: "Bài hình tròn bị lỗi hiển thị bán kính ở phần tính toán." }
+        ];
 
-            // Render trang quản trị (kèm nút Xóa)
-            const adminContainer = document.getElementById('adminListContainer');
-            adminContainer.innerHTML = '';
-            simulations.forEach((sim, index) => {
-                adminContainer.innerHTML += `
-                    <div class="admin-item">
-                        <span><b>${sim.name}</b></span>
-                        <button class="btn btn-danger" onclick="deleteSimulation(${index})">Xóa</button>
-                    </div>
-                `;
-            });
+        let accessLogs = [
+            { time: "24/07/2026 20:10:15", email: "hocsinh@gmail.com", module: "HỆ MẶT TRỜI MÔ PHỎNG" },
+            { time: "24/07/2026 20:15:40", email: "hocsinh@gmail.com", module: "TOÁN HÌNH" }
+        ];
+
+        function checkAdminPassword() {
+            let pass = prompt("Nhập mật khẩu trang quản trị (Mật khẩu mặc định: admin123):");
+            if (pass === ADMIN_PASSWORD) {
+                switchView('admin');
+            } else if (pass !== null) {
+                alert("Mật khẩu không chính xác!");
+            }
         }
 
-        function addSimulation() {
-            const name = document.getElementById('simName').value.trim();
-            const link = document.getElementById('simLink').value.trim();
+        function switchView(role) {
+            if (role === 'student') {
+                document.getElementById('studentView').classList.remove('hidden');
+                document.getElementById('adminView').classList.add('hidden');
+            } else {
+                document.getElementById('studentView').classList.add('hidden');
+                document.getElementById('adminView').classList.remove('hidden');
+                renderAdminData();
+            }
+        }
 
-            if (!name || !link) {
-                alert("Vui lòng nhập đầy đủ tên và đường dẫn!");
+        function renderModules() {
+            let studentHtml = '';
+            let adminHtml = '';
+
+            modules.forEach((mod, index) => {
+                studentHtml += `
+                    <div class="item-row">
+                        <div>
+                            <strong style="color: #fff; font-size: 16px;">${mod.title}</strong>
+                            <p style="color: var(--text-muted); font-size: 13px;">Bài mô phỏng tùy chỉnh</p>
+                        </div>
+                        <button onclick="accessModule('${mod.title}')" style="background: var(--accent-purple); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Truy cập ngay</button>
+                    </div>
+                `;
+
+                adminHtml += `
+                    <div class="item-row">
+                        <strong style="color: #fff;">${mod.title}</strong>
+                        <button class="btn-danger" onclick="deleteModule(${index})">Xóa</button>
+                    </div>
+                `;
+            });
+
+            document.getElementById('studentModuleList').innerHTML = studentHtml;
+            document.getElementById('adminModuleList').innerHTML = adminHtml;
+        }
+
+        function accessModule(moduleTitle) {
+            const currentEmail = document.getElementById('currentUserEmail').value || "hocsinh@gmail.com";
+            const now = new Date().toLocaleString('vi-VN');
+            
+            accessLogs.unshift({ time: now, email: currentEmail, module: moduleTitle });
+            alert(`Đang mở bài mô phỏng: ${moduleTitle}`);
+        }
+
+        function submitComplaint() {
+            const name = document.getElementById('complaintName').value;
+            const email = document.getElementById('currentUserEmail').value;
+            const content = document.getElementById('complaintContent').value;
+
+            if (!content.trim()) {
+                alert('Vui lòng nhập nội dung khiếu nại!');
                 return;
             }
 
-            simulations.push({ name: name, desc: "Bài mô phỏng tùy chỉnh", link: link });
-            localStorage.setItem('simulations', JSON.stringify(simulations));
+            const now = new Date().toLocaleString('vi-VN');
+            complaints.unshift({ time: now, name: name, email: email, content: content });
             
-            document.getElementById('simName').value = '';
-            document.getElementById('simLink').value = '';
-            
-            renderSimulations();
-            alert("Thêm bài học thành công!");
+            alert('Gửi khiếu nại thành công!');
+            document.getElementById('complaintContent').value = '';
         }
 
-        function deleteSimulation(index) {
-            if (confirm("Bạn có chắc chắn muốn xóa bài mô phỏng này không?")) {
-                simulations.splice(index, 1);
-                localStorage.setItem('simulations', JSON.stringify(simulations));
-                renderSimulations();
+        function addModule() {
+            const title = document.getElementById('newTitle').value;
+            const link = document.getElementById('newLink').value;
+            if(title) {
+                modules.push({ title: title, link: link });
+                document.getElementById('newTitle').value = '';
+                document.getElementById('newLink').value = '';
+                renderModules();
+                alert('Thêm bài học thành công!');
             }
         }
 
-        function showAdmin(e) {
-            e.preventDefault();
-            const password = prompt("Nhập mật khẩu quản trị viên:");
-            if (password === ADMIN_PASSWORD) {
-                document.getElementById('homeView').style.display = 'none';
-                document.getElementById('adminView').style.display = 'block';
-            } else if (password !== null) {
-                alert("Sai mật khẩu!");
-            }
+        function deleteModule(index) {
+            modules.splice(index, 1);
+            renderModules();
         }
 
-        function showHome(e) {
-            e.preventDefault();
-            document.getElementById('adminView').style.display = 'none';
-            document.getElementById('homeView').style.display = 'block';
+        function deleteComplaint(index) {
+            complaints.splice(index, 1);
+            renderAdminData();
         }
 
-        function handleKeyPress(e) {
-            if (e.key === 'Enter') sendMessage();
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.innerHTML += `<div class="chat-msg chat-user">${text}</div>`;
+            input.value = '';
+
+            setTimeout(() => {
+                let reply = "Xin chào! Bạn có thể chọn truy cập các bài mô phỏng phía trên hoặc gửi khiếu nại nếu gặp lỗi nhé.";
+                if (text.toLowerCase().includes("toán") || text.toLowerCase().includes("hình")) {
+                    reply = "Phần Toán Hình hỗ trợ tính toán chi tiết hình tròn và tam giác vuông kèm theo biểu diễn đồ họa trực quan.";
+                } else if (text.toLowerCase().includes("lỗi") || text.toLowerCase().includes("khiếu nại")) {
+                    reply = "Bạn có thể điền thông tin vào mục 'Gửi Khiếu Nại / Báo Lỗi Bài Học' ở ngay bên dưới để giáo viên kiểm tra.";
+                }
+                chatContainer.innerHTML += `<div class="chat-msg chat-bot">${reply}</div>`;
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 500);
         }
 
-        async function sendMessage() {
-            const inputField = document.getElementById('userInput');
-            const messageContainer = document.getElementById('chatMessages');
-            const userText = inputField.value.trim();
+        function renderAdminData() {
+            renderModules();
 
-            if (!userText) return;
+            let compHtml = '';
+            complaints.forEach((c, idx) => {
+                compHtml += `
+                    <tr>
+                        <td>${c.time}</td>
+                        <td><b>${c.name}</b></td>
+                        <td style="color: #38bdf8;">${c.email}</td>
+                        <td>${c.content}</td>
+                        <td><button class="btn-danger" onclick="deleteComplaint(${idx})">Xóa</button></td>
+                    </tr>
+                `;
+            });
+            document.getElementById('complaintTableBody').innerHTML = compHtml || `<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">Chưa có khiếu nại nào.</td></tr>`;
 
-            messageContainer.innerHTML += `<div class="message user-msg">${userText}</div>`;
-            inputField.value = '';
-            messageContainer.scrollTop = messageContainer.scrollHeight;
-
-            const loadingId = 'loading_' + Date.now();
-            messageContainer.innerHTML += `<div class="message ai-msg" id="${loadingId}">AI đang suy nghĩ...</div>`;
-            messageContainer.scrollTop = messageContainer.scrollHeight;
-
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: userText })
-                });
-
-                const data = await response.json();
-                document.getElementById(loadingId).remove();
-                messageContainer.innerHTML += `<div class="message ai-msg">${data.reply || data.error}</div>`;
-            } catch (error) {
-                document.getElementById(loadingId).remove();
-                messageContainer.innerHTML += `<div class="message ai-msg">Lỗi kết nối tới server!</div>`;
-            }
-
-            messageContainer.scrollTop = messageContainer.scrollHeight;
+            let logHtml = '';
+            accessLogs.forEach(log => {
+                logHtml += `
+                    <tr>
+                        <td>${log.time}</td>
+                        <td style="color: #38bdf8; font-weight: bold;">${log.email}</td>
+                        <td>${log.module}</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('accessLogTableBody').innerHTML = logHtml || `<tr><td colspan="3" style="text-align:center; color: var(--text-muted);">Chưa có lịch sử truy cập nào.</td></tr>`;
         }
 
-        // Tải danh sách khi mở trang
-        renderSimulations();
+        renderModules();
     </script>
 </body>
 </html>
