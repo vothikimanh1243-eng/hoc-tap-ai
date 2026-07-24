@@ -24,6 +24,12 @@
         
         h1, h2, h3 { color: #fff; display: flex; align-items: center; gap: 10px; }
         
+        /* Khu vực Logo */
+        .header-banner { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: 15px 20px; border-radius: 12px; border: 1px solid var(--border-color); }
+        .logo-box { display: flex; align-items: center; gap: 12px; }
+        .logo-placeholder { width: 45px; height: 45px; background: var(--accent-purple); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; overflow: hidden; }
+        .logo-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+
         .nav-bar { display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: 15px 20px; border-radius: 12px; border: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px; }
         .nav-bar button { background: var(--accent-purple); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
         .nav-bar button:hover { background: var(--accent-hover); }
@@ -44,13 +50,14 @@
         .chat-bot { background: #1e293b; align-self: flex-start; color: #fff; }
         .chat-user { background: var(--accent-purple); align-self: flex-end; color: #fff; }
 
-        .hidden { display: none !important; }
+        .view-section { display: none; }
+        .view-section.active { display: flex; flex-direction: column; gap: 20px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- THANH ĐIỀU HƯỚNG -->
+        <!-- THANH ĐIỀU HƯỚNG & TÀI KHOẢN -->
         <div class="nav-bar">
             <div>
                 <label style="font-size: 13px; color: var(--text-muted);">Email của bạn:</label>
@@ -58,12 +65,24 @@
             </div>
             <div>
                 <button type="button" onclick="switchView('student')">Trang Học Sinh</button>
-                <button type="button" onclick="checkAdminPassword()">Trang Quản Trị (Admin)</button>
+                <button type="button" onclick="verifyAdmin()">Trang Quản Trị (Admin)</button>
             </div>
         </div>
 
         <!-- 1. GIAO DIỆN HỌC SINH -->
-        <div id="studentView" class="container" style="gap: 20px;">
+        <div id="studentView" class="view-section active">
+            <!-- LOGO & TIÊU ĐỀ HỌC SINH -->
+            <div class="header-banner">
+                <div class="logo-box">
+                    <!-- BẠN CÓ THỂ THAY THẺ DIV NÀY BẰNG THẺ <img src="link_logo_cua_ban.png"> -->
+                    <img src="logo-dark-removebg-preview.png">
+                    <div>
+                        <h2 style="font-size: 18px;">Cổng Mô Phỏng Học Tập</h2>
+                        <p style="font-size: 12px; color: var(--text-muted);">Dành cho học sinh trải nghiệm</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="card">
                 <h2>🚀 Danh Sách Bài Mô Phỏng</h2>
                 <div id="studentModuleList" style="display: flex; flex-direction: column; gap: 10px;"></div>
@@ -73,7 +92,7 @@
             <div class="card">
                 <h2>🤖 Trợ Lý AI Học Tập</h2>
                 <div class="chat-box" id="chatContainer">
-                    <div class="chat-msg chat-bot">Xin chào! Mình có thể hỗ trợ gì cho bạn về các bài mô phỏng trên web?</div>
+                    <div class="chat-msg chat-bot">Xin chào! Bạn có thể bấm nút "Truy cập ngay" ở trên để mở các bài mô phỏng Toán, Hóa...</div>
                 </div>
                 <div style="display: flex; gap: 10px;">
                     <input type="text" id="chatInput" placeholder="Nhập câu hỏi cho AI..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
@@ -93,23 +112,35 @@
         </div>
 
         <!-- 2. GIAO DIỆN QUẢN TRỊ (ADMIN) -->
-        <div id="adminView" class="container hidden" style="gap: 20px;">
+        <div id="adminView" class="view-section">
+            <!-- LOGO & TIÊU ĐỀ ADMIN -->
+            <div class="header-banner">
+                <div class="logo-box">
+                    <!-- BẠN CÓ THỂ THAY THẺ DIV NÀY BẰNG THẺ <img src="link_logo_cua_ban.png"> -->
+                    <div class="logo-placeholder" style="background: var(--warning); color: #000;">ADMIN</div>
+                    <div>
+                        <h2 style="font-size: 18px;">Hệ Thống Quản Trị Hệ Thống</h2>
+                        <p style="font-size: 12px; color: var(--text-muted);">Dành riêng cho giáo viên / quản trị viên</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="card">
-                <h2>⚙️ Trang Quản Trị Bài Mô Phỏng</h2>
+                <h2>⚙️ Thêm Bài Mô Phỏng Mới (Toán, Hóa,...)</h2>
                 <div style="display: flex; flex-direction: column; gap: 10px;">
                     <label>Tên bài mô phỏng:</label>
-                    <input type="text" id="newTitle" placeholder="Ví dụ: Vật Lý - Con Lắc Đơn">
-                    <label>Đường dẫn (Link):</label>
-                    <input type="text" id="newLink" placeholder="Ví dụ: vat-ly.html">
-                    <button type="button" onclick="addModule()" style="background: var(--accent-purple); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold;">Thêm bài học mới</button>
+                    <input type="text" id="newTitle" placeholder="Ví dụ: Toán Hình - Diện Tích Tròn">
+                    <label>Đường dẫn trang web (File HTML hoặc Link):</label>
+                    <input type="text" id="newLink" placeholder="Ví dụ: toan-hinh.html hoặc https://...">
+                    <button type="button" onclick="addModule()" style="background: var(--accent-purple); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold;">Thêm vào hệ thống</button>
                 </div>
-                <h3 style="margin-top: 10px;">Danh sách bài hiện có:</h3>
+                <h3 style="margin-top: 10px;">Quản lý danh sách bài học hiện có:</h3>
                 <div id="adminModuleList" style="display: flex; flex-direction: column; gap: 10px;"></div>
             </div>
 
-            <!-- PHẦN SỐ 1: XEM KHIẾU NẠI CỦA HỌC SINH -->
+            <!-- KHIẾU NẠI -->
             <div class="card" style="border-color: var(--warning);">
-                <h3 style="color: var(--warning);">📋 Số 1: Xem Khiếu Nại Của Học Sinh</h3>
+                <h3 style="color: var(--warning);">📋 Xem Khiếu Nại Của Học Sinh</h3>
                 <div style="overflow-x: auto;">
                     <table>
                         <thead>
@@ -117,7 +148,7 @@
                                 <th>Thời gian</th>
                                 <th>Học sinh</th>
                                 <th>Email</th>
-                                <th>Nội dung khiếu nại</th>
+                                <th>Nội dung</th>
                                 <th>Thao tác</th>
                             </tr>
                         </thead>
@@ -126,16 +157,16 @@
                 </div>
             </div>
 
-            <!-- PHẦN SỐ 2: THỜI GIAN & EMAIL TRUY CẬP -->
+            <!-- LỊCH SỬ TRUY CẬP -->
             <div class="card" style="border-color: #38bdf8;">
-                <h3 style="color: #38bdf8;">📊 Số 2: Lịch Sử Thời Gian & Email Học Sinh Truy Cập</h3>
+                <h3 style="color: #38bdf8;">📊 Lịch Sử Học Sinh Truy Cập Mô Phỏng</h3>
                 <div style="overflow-x: auto;">
                     <table>
                         <thead>
                             <tr>
-                                <th>Thời gian truy cập</th>
+                                <th>Thời gian</th>
                                 <th>Email học sinh</th>
-                                <th>Bài mô phỏng đã truy cập</th>
+                                <th>Bài mô phỏng</th>
                             </tr>
                         </thead>
                         <tbody id="accessLogTableBody"></tbody>
@@ -146,26 +177,25 @@
     </div>
 
     <script>
-        const ADMIN_PASSWORD = "682010@?"; // Mật khẩu quản trị mặc định
+        const ADMIN_PASSWORD = "682010@?";
 
+        // Danh sách bài học (Bạn có thể tự thêm sửa qua trang Admin hoặc sửa trực tiếp tại đây)
         let modules = [
-            { title: "HỆ MẶT TRỜI MÔ PHỎNG", link: "#" },
-            { title: "HOÁ HỌC MÔ PHỎNG PHA CHẾ", link: "#" },
-            { title: "LÒ PHẢN ỨNG HẠT NHÂN MÔ PHỎNG", link: "#" },
-            { title: "TOÁN HÌNH", link: "#" }
+            { title: "HỆ MẶT TRỜI MÔ PHỎNG", link: "solar.html" },
+            { title: "HOÁ HỌC MÔ PHỎNG PHA CHẾ", link: "chemistry.html" },
+            { title: "TOÁN HÌNH - DIỆN TÍCH", link: "math.html" }
         ];
 
         let complaints = [
-            { time: "24/07/2026 15:30:00", name: "Nguyễn Văn A", email: "vana@gmail.com", content: "Bài hình tròn bị lỗi hiển thị bán kính ở phần tính toán." }
+            { time: "24/07/2026 15:30:00", name: "Nguyễn Văn A", email: "vana@gmail.com", content: "Bài hình tròn bị lỗi hiển thị bán kính." }
         ];
 
         let accessLogs = [
-            { time: "24/07/2026 20:10:15", email: "hocsinh@gmail.com", module: "HỆ MẶT TRỜI MÔ PHỎNG" },
-            { time: "24/07/2026 20:15:40", email: "hocsinh@gmail.com", module: "TOÁN HÌNH" }
+            { time: "24/07/2026 20:10:15", email: "hocsinh@gmail.com", module: "HỆ MẶT TRỜI MÔ PHỎNG" }
         ];
 
-        function checkAdminPassword() {
-            let pass = prompt("Nhập mật khẩu trang quản trị (Mật khẩu mặc định: 682010@?):");
+        function verifyAdmin() {
+            let pass = prompt("Nhập mật khẩu quản trị (Mặc định: admin123):");
             if (pass === ADMIN_PASSWORD) {
                 switchView('admin');
             } else if (pass !== null) {
@@ -173,16 +203,13 @@
             }
         }
 
-        function switchView(role) {
-            const studentView = document.getElementById('studentView');
-            const adminView = document.getElementById('adminView');
-
-            if (role === 'student') {
-                studentView.classList.remove('hidden');
-                adminView.classList.add('hidden');
-            } else {
-                studentView.classList.add('hidden');
-                adminView.classList.remove('hidden');
+        function switchView(viewName) {
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.getElementById(viewName + 'View').classList.add('active');
+            
+            if(viewName === 'admin') {
                 renderAdminData();
             }
         }
@@ -196,15 +223,18 @@
                     <div class="item-row">
                         <div>
                             <strong style="color: #fff; font-size: 16px;">${mod.title}</strong>
-                            <p style="color: var(--text-muted); font-size: 13px;">Bài mô phỏng tùy chỉnh</p>
+                            <p style="color: var(--text-muted); font-size: 13px;">File liên kết: ${mod.link}</p>
                         </div>
-                        <button type="button" onclick="accessModule('${mod.title}')" style="background: var(--accent-purple); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Truy cập ngay</button>
+                        <button type="button" onclick="accessModule('${mod.title}', '${mod.link}')" style="background: var(--accent-purple); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Truy cập ngay</button>
                     </div>
                 `;
 
                 adminHtml += `
                     <div class="item-row">
-                        <strong style="color: #fff;">${mod.title}</strong>
+                        <div>
+                            <strong style="color: #fff;">${mod.title}</strong>
+                            <span style="color: var(--text-muted); font-size: 12px; margin-left: 10px;">(${mod.link})</span>
+                        </div>
                         <button type="button" class="btn-danger" onclick="deleteModule(${index})">Xóa</button>
                     </div>
                 `;
@@ -214,12 +244,17 @@
             document.getElementById('adminModuleList').innerHTML = adminHtml;
         }
 
-        function accessModule(moduleTitle) {
+        function accessModule(moduleTitle, moduleLink) {
             const currentEmail = document.getElementById('currentUserEmail').value || "hocsinh@gmail.com";
             const now = new Date().toLocaleString('vi-VN');
             
             accessLogs.unshift({ time: now, email: currentEmail, module: moduleTitle });
-            alert(`Đang mở bài mô phỏng: ${moduleTitle}`);
+
+            if(moduleLink && moduleLink !== '#') {
+                window.open(moduleLink, '_blank');
+            } else {
+                alert(`Đang mở: ${moduleTitle} (Chưa cấu hình đường dẫn file)`);
+            }
         }
 
         function submitComplaint() {
@@ -242,12 +277,14 @@
         function addModule() {
             const title = document.getElementById('newTitle').value;
             const link = document.getElementById('newLink').value;
-            if(title) {
-                modules.push({ title: title, link: link });
+            if(title.trim()) {
+                modules.push({ title: title, link: link.trim() || '#' });
                 document.getElementById('newTitle').value = '';
                 document.getElementById('newLink').value = '';
                 renderModules();
-                alert('Thêm bài học thành công!');
+                alert('Thêm bài học mô phỏng thành công!');
+            } else {
+                alert('Vui lòng nhập tên bài mô phỏng!');
             }
         }
 
@@ -271,12 +308,7 @@
             input.value = '';
 
             setTimeout(() => {
-                let reply = "Xin chào! Bạn có thể chọn truy cập các bài mô phỏng phía trên hoặc gửi khiếu nại nếu gặp lỗi nhé.";
-                if (text.toLowerCase().includes("toán") || text.toLowerCase().includes("hình")) {
-                    reply = "Phần Toán Hình hỗ trợ tính toán chi tiết hình tròn và tam giác vuông kèm theo biểu diễn đồ họa trực quan.";
-                } else if (text.toLowerCase().includes("lỗi") || text.toLowerCase().includes("khiếu nại")) {
-                    reply = "Bạn có thể điền thông tin vào mục 'Gửi Khiếu Nại / Báo Lỗi Bài Học' ở ngay bên dưới để giáo viên kiểm tra.";
-                }
+                let reply = "Bạn có thể bấm nút 'Truy cập ngay' ở các bài học phía trên để mở trang mô phỏng tương ứng nhé.";
                 chatContainer.innerHTML += `<div class="chat-msg chat-bot">${reply}</div>`;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             }, 500);
@@ -312,7 +344,6 @@
             document.getElementById('accessLogTableBody').innerHTML = logHtml || `<tr><td colspan="3" style="text-align:center; color: var(--text-muted);">Chưa có lịch sử truy cập nào.</td></tr>`;
         }
 
-        // Khởi tạo chạy lần đầu
         renderModules();
     </script>
 </body>
