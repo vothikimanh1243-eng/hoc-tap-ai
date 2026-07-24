@@ -27,26 +27,23 @@
         .btn { background: var(--accent-purple); color: #fff; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; border: none; cursor: pointer; }
         .btn:hover { background: var(--accent-hover); }
 
+        /* Khung Chat AI */
+        .ai-chat-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-top: 30px; }
+        .chat-messages { height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 15px; background: #0b0f19; font-size: 14px; display: flex; flex-direction: column; gap: 8px; }
+        .message { padding: 8px 12px; border-radius: 6px; max-width: 80%; line-height: 1.4; }
+        .user-msg { background: var(--accent-purple); color: white; align-self: flex-end; }
+        .ai-msg { background: #1e293b; color: var(--text-main); align-self: flex-start; }
+        .chat-input-area { display: flex; gap: 10px; }
+        .chat-input-area input { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: #1e293b; color: #fff; outline: none; }
+
         /* Giao diện Quản trị ẩn/hiện */
         #adminView { display: none; background: var(--bg-secondary); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); width: 100%; max-width: 600px; margin-top: 20px; }
         #adminView h2 { margin-bottom: 15px; font-size: 20px; }
-        input { width: 100%; padding: 12px; margin-top: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: #1e293b; color: #fff; outline: none; }
+        #adminView input { width: 100%; padding: 12px; margin-top: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: #1e293b; color: #fff; outline: none; }
 
         /* Nút Quản trị ở góc phải */
         .admin-trigger { position: fixed; bottom: 10px; right: 10px; color: var(--text-muted); font-size: 12px; text-decoration: none; background: var(--bg-secondary); padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); cursor: pointer; }
         .admin-trigger:hover { color: #fff; }
-          /* Khung chat */
-        .chat-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; margin-top: 30px; display: flex; flex-direction: column; height: 400px; overflow: hidden; }
-        .chat-header { background: #1e293b; padding: 15px; font-weight: bold; border-bottom: 1px solid var(--border-color); }
-        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .message { padding: 10px 14px; border-radius: 8px; max-width: 75%; font-size: 14px; line-height: 1.4; }
-        .message.bot { background: #1e293b; align-self: flex-start; border-bottom-left-radius: 2px; }
-        .message.user { background: var(--accent-purple); align-self: flex-end; border-bottom-right-radius: 2px; }
-        .chat-input-area { display: flex; padding: 12px; border-top: 1px solid var(--border-color); background: #1e293b; }
-        .chat-input-area input { flex: 1; background: var(--bg-primary); border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; color: white; outline: none; }
-        .chat-input-area button { background: var(--accent-purple); color: white; border: none; padding: 0 20px; margin-left: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .chat-input-area button:hover { background: var(--accent-hover); }
-    </style>
     </style>
 </head>
 <body>
@@ -70,6 +67,18 @@
             </div>
             <a href="#" class="btn">Truy cập ngay</a>
         </div>
+
+        <!-- KHUNG CHAT AI -->
+        <div class="ai-chat-box">
+            <h3 style="margin-bottom: 12px; font-size: 18px;">🤖 Trợ Lý AI Học Tập</h3>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai-msg">Xin chào! Mình có thể hỗ trợ gì cho bạn về các bài mô phỏng trên web?</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="userInput" placeholder="Nhập câu hỏi cho AI..." onkeypress="handleKeyPress(event)">
+                <button class="btn" onclick="sendMessage()">Gửi</button>
+            </div>
+        </div>
     </div>
 
     <!-- PHẦN TRANG QUẢN TRỊ (ẨN LÚC ĐẦU) -->
@@ -89,19 +98,6 @@
         <a href="#" onclick="showHome(event)" style="color: var(--text-muted); text-decoration: none; font-size: 14px;">← Quay lại trang chủ học sinh</a>
     </div>
 
-    <div>
-           <div class="chat-box">
-            <div class="chat-header">🤖 Trợ Lý AI Học Tập Trực Tuyến</div>
-            <div class="chat-messages" id="chatMessages">
-                <div class="message bot">Xin chào! Mình là trợ lý AI. Bạn cần hỗ trợ gì về các bài mô phỏng trên trang web không?</div>
-            </div>
-            <div class="chat-input-area">
-                <input type="text" id="userInput" placeholder="Nhập câu hỏi cho AI..." onkeypress="handleKeyPress(event)">
-                <button onclick="sendMessage()">Gửi</button>
-            </div>
-        </div>
-    </div>
-
     <!-- NÚT BẤM CHUYỂN QUA LẠI QUẢN TRỊ -->
     <a class="admin-trigger" onclick="showAdmin(event)">⚙️ Quản Trị</a>
 
@@ -117,37 +113,101 @@
             document.getElementById('adminView').style.display = 'none';
             document.getElementById('homeView').style.display = 'block';
         }
-        
-         async function sendMessage() {
-            const input = document.getElementById('userInput');
-            const messages = document.getElementById('chatMessages');
-            const text = input.value.trim();
-            if (!text) return;
 
-            messages.innerHTML += `<div class="message user">${text}</div>`;
-            input.value = "";
-            messages.scrollTop = messages.scrollHeight;
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
 
-            const loadingId = 'loading-' + Date.now();
-            messages.innerHTML += `<div class="message bot" id="${loadingId}">AI đang suy nghĩ...</div>`;
-            messages.scrollTop = messages.scrollHeight;
+        async function sendMessage() {
+            const inputField = document.getElementById('userInput');
+            const messageContainer = document.getElementById('chatMessages');
+            const userText = inputField.value.trim();
+
+            if (!userText) return;
+
+            messageContainer.innerHTML += `<div class="message user-msg">${userText}</div>`;
+            inputField.value = '';
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+
+            const loadingId = 'loading_' + Date.now();
+            messageContainer.innerHTML += `<div class="message ai-msg" id="${loadingId}">AI đang suy nghĩ...</div>`;
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+
+            try {
+                // Gọi API backend bảo mật trên Vercel (/api/chat)
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: userText })
+                });
+
+                const data = await response.json();
+                document.getElementById(loadingId).remove();
+                messageContainer.innerHTML += `<div class="message ai-msg">${data.reply || data.error}</div>`;
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                messageContainer.innerHTML += `<div class="message ai-msg">Lỗi kết nối tới server!</div>`;
+            }
+
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+        // Đặt mật khẩu quản trị viên của bạn ở đây
+        const ADMIN_PASSWORD = "682010@?"; // Bạn có thể thay đổi mật khẩu tùy ý
+
+        function showAdmin(e) {
+            e.preventDefault();
+            const password = prompt("Nhập mật khẩu quản trị viên:");
+            
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('homeView').style.display = 'none';
+                document.getElementById('adminView').style.display = 'block';
+            } else if (password !== null) {
+                alert("Sai mật khẩu!");
+            }
+        }
+
+        function showHome(e) {
+            e.preventDefault();
+            document.getElementById('adminView').style.display = 'none';
+            document.getElementById('homeView').style.display = 'block';
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        async function sendMessage() {
+            const inputField = document.getElementById('userInput');
+            const messageContainer = document.getElementById('chatMessages');
+            const userText = inputField.value.trim();
+
+            if (!userText) return;
+
+            messageContainer.innerHTML += `<div class="message user-msg">${userText}</div>`;
+            inputField.value = '';
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+
+            const loadingId = 'loading_' + Date.now();
+            messageContainer.innerHTML += `<div class="message ai-msg" id="${loadingId}">AI đang suy nghĩ...</div>`;
+            messageContainer.scrollTop = messageContainer.scrollHeight;
 
             try {
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text })
+                    body: JSON.stringify({ message: userText })
                 });
-                const data = await response.json();
-                document.getElementById(loadingId).innerText = data.reply || data.error;
-            } catch (error) {
-                document.getElementById(loadingId).innerText = "Có lỗi từ máy chủ AI.";
-            }
-            messages.scrollTop = messages.scrollHeight;
-        }
 
-        function handleKeyPress(e) {
-            if (e.key === 'Enter') sendMessage();
+                const data = await response.json();
+                document.getElementById(loadingId).remove();
+                messageContainer.innerHTML += `<div class="message ai-msg">${data.reply || data.error}</div>`;
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                messageContainer.innerHTML += `<div class="message ai-msg">Lỗi kết nối tới server!</div>`;
+            }
+
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
     </script>
 </body>
 </html>
