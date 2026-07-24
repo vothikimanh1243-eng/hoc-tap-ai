@@ -1,9 +1,0 @@
-{
-  "name": "hoc-tap-ai",
-  "version": "1.0.0",
-  "description": "Hệ thống học tập kết hợp AI và Admin",
-  "main": "index.js",
-  "dependencies": {
-    "groq-sdk": "^0.3.0"
-  }
-}
