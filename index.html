@@ -115,6 +115,18 @@
         function handleKeyPress(e) {
             if (e.key === 'Enter') sendMessage();
         }
+        // Phím tắt mở nhanh bảng quản trị Admin trên trang chủ
+window.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+        const pass = prompt("Nhập mật khẩu quản trị:");
+        if (pass === "682010@") { // Thay "123" bằng mật khẩu bạn muốn
+            alert("Đã đăng nhập quyền Admin thành công!");
+            // Thêm logic mở form thêm/xóa bài mô phỏng tại đây
+        } else if (pass !== null) {
+            alert("Sai mật khẩu!");
+        }
+    }
+});
     </script>
 </body>
 </html>
