@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Mô Phỏng Học Tập & Quản Trị Bảo Mật</title>
+    <title>Hệ Thống Mô Phỏng Học Tập & Quản Trị</title>
     <style>
         :root {
             --bg-primary: #0b0f19;
@@ -44,7 +44,7 @@
         .chat-bot { background: #1e293b; align-self: flex-start; color: #fff; }
         .chat-user { background: var(--accent-purple); align-self: flex-end; color: #fff; }
 
-        .hidden { display: none; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -57,8 +57,8 @@
                 <input type="email" id="currentUserEmail" value="hocsinh@gmail.com" style="width: 200px; display: inline-block; padding: 5px 10px; margin-left: 5px;">
             </div>
             <div>
-                <button onclick="switchView('student')">Trang Học Sinh</button>
-                <button onclick="checkAdminPassword()">Trang Quản Trị (Admin)</button>
+                <button type="button" onclick="switchView('student')">Trang Học Sinh</button>
+                <button type="button" onclick="checkAdminPassword()">Trang Quản Trị (Admin)</button>
             </div>
         </div>
 
@@ -77,7 +77,7 @@
                 </div>
                 <div style="display: flex; gap: 10px;">
                     <input type="text" id="chatInput" placeholder="Nhập câu hỏi cho AI..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
-                    <button onclick="sendChatMessage()" style="background: var(--accent-purple); color: white; border: none; padding: 0 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">Gửi</button>
+                    <button type="button" onclick="sendChatMessage()" style="background: var(--accent-purple); color: white; border: none; padding: 0 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">Gửi</button>
                 </div>
             </div>
 
@@ -87,7 +87,7 @@
                 <div style="display: flex; flex-direction: column; gap: 10px;">
                     <input type="text" id="complaintName" placeholder="Họ và tên của bạn..." value="Nguyễn Văn Học Sinh">
                     <textarea id="complaintContent" rows="3" placeholder="Nhập nội dung khiếu nại, báo lỗi bài mô phỏng hoặc thắc mắc..."></textarea>
-                    <button onclick="submitComplaint()" style="background: var(--warning); color: #000; font-weight: bold; border: none; padding: 10px; border-radius: 6px; cursor: pointer;">Gửi Khiếu Nại</button>
+                    <button type="button" onclick="submitComplaint()" style="background: var(--warning); color: #000; font-weight: bold; border: none; padding: 10px; border-radius: 6px; cursor: pointer;">Gửi Khiếu Nại</button>
                 </div>
             </div>
         </div>
@@ -101,7 +101,7 @@
                     <input type="text" id="newTitle" placeholder="Ví dụ: Vật Lý - Con Lắc Đơn">
                     <label>Đường dẫn (Link):</label>
                     <input type="text" id="newLink" placeholder="Ví dụ: vat-ly.html">
-                    <button onclick="addModule()" style="background: var(--accent-purple); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold;">Thêm bài học mới</button>
+                    <button type="button" onclick="addModule()" style="background: var(--accent-purple); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold;">Thêm bài học mới</button>
                 </div>
                 <h3 style="margin-top: 10px;">Danh sách bài hiện có:</h3>
                 <div id="adminModuleList" style="display: flex; flex-direction: column; gap: 10px;"></div>
@@ -149,10 +149,10 @@
         const ADMIN_PASSWORD = "682010@?"; // Mật khẩu quản trị mặc định
 
         let modules = [
-            { title: "HỆ MẶT TRỜI MÔ PHỎNG", link: "https://vothikimanh1243-eng.github.io/h-n-t-tr-i/" },
-            { title: "HOÁ HỌC MÔ PHỎNG PHA CHẾ", link: "https://vothikimanh1243-eng.github.io/hoa-hoc/" },
-            { title: "LÒ PHẢN ỨNG HẠT NHÂN MÔ PHỎNG", link: "https://vothikimanh1243-eng.github.io/l-ph-n-ng/" },
-            { title: "TOÁN HÌNH", link: "https://vothikimanh1243-eng.github.io/toan/" }
+            { title: "HỆ MẶT TRỜI MÔ PHỎNG", link: "#" },
+            { title: "HOÁ HỌC MÔ PHỎNG PHA CHẾ", link: "#" },
+            { title: "LÒ PHẢN ỨNG HẠT NHÂN MÔ PHỎNG", link: "#" },
+            { title: "TOÁN HÌNH", link: "#" }
         ];
 
         let complaints = [
@@ -165,7 +165,7 @@
         ];
 
         function checkAdminPassword() {
-            let pass = prompt("Nhập mật khẩu trang quản trị (Mật khẩu mặc định: admin123):");
+            let pass = prompt("Nhập mật khẩu trang quản trị (Mật khẩu mặc định: 682010@?):");
             if (pass === ADMIN_PASSWORD) {
                 switchView('admin');
             } else if (pass !== null) {
@@ -174,12 +174,15 @@
         }
 
         function switchView(role) {
+            const studentView = document.getElementById('studentView');
+            const adminView = document.getElementById('adminView');
+
             if (role === 'student') {
-                document.getElementById('studentView').classList.remove('hidden');
-                document.getElementById('adminView').classList.add('hidden');
+                studentView.classList.remove('hidden');
+                adminView.classList.add('hidden');
             } else {
-                document.getElementById('studentView').classList.add('hidden');
-                document.getElementById('adminView').classList.remove('hidden');
+                studentView.classList.add('hidden');
+                adminView.classList.remove('hidden');
                 renderAdminData();
             }
         }
@@ -195,14 +198,14 @@
                             <strong style="color: #fff; font-size: 16px;">${mod.title}</strong>
                             <p style="color: var(--text-muted); font-size: 13px;">Bài mô phỏng tùy chỉnh</p>
                         </div>
-                        <button onclick="accessModule('${mod.title}')" style="background: var(--accent-purple); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Truy cập ngay</button>
+                        <button type="button" onclick="accessModule('${mod.title}')" style="background: var(--accent-purple); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Truy cập ngay</button>
                     </div>
                 `;
 
                 adminHtml += `
                     <div class="item-row">
                         <strong style="color: #fff;">${mod.title}</strong>
-                        <button class="btn-danger" onclick="deleteModule(${index})">Xóa</button>
+                        <button type="button" class="btn-danger" onclick="deleteModule(${index})">Xóa</button>
                     </div>
                 `;
             });
@@ -290,7 +293,7 @@
                         <td><b>${c.name}</b></td>
                         <td style="color: #38bdf8;">${c.email}</td>
                         <td>${c.content}</td>
-                        <td><button class="btn-danger" onclick="deleteComplaint(${idx})">Xóa</button></td>
+                        <td><button type="button" class="btn-danger" onclick="deleteComplaint(${idx})">Xóa</button></td>
                     </tr>
                 `;
             });
@@ -309,6 +312,7 @@
             document.getElementById('accessLogTableBody').innerHTML = logHtml || `<tr><td colspan="3" style="text-align:center; color: var(--text-muted);">Chưa có lịch sử truy cập nào.</td></tr>`;
         }
 
+        // Khởi tạo chạy lần đầu
         renderModules();
     </script>
 </body>
