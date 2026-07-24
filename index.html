@@ -10,6 +10,8 @@
             --bg-secondary: #131b2e;
             --accent-purple: #8b5cf6;
             --accent-hover: #7c3aed;
+            --accent-red: #ef4444;
+            --accent-red-hover: #dc2626;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --border-color: #334155;
@@ -27,6 +29,9 @@
         .btn { background: var(--accent-purple); color: #fff; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; border: none; cursor: pointer; }
         .btn:hover { background: var(--accent-hover); }
 
+        .btn-danger { background: var(--accent-red); padding: 8px 12px; font-size: 13px; }
+        .btn-danger:hover { background: var(--accent-red-hover); }
+
         /* Khung Chat AI */
         .ai-chat-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-top: 30px; }
         .chat-messages { height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 15px; background: #0b0f19; font-size: 14px; display: flex; flex-direction: column; gap: 8px; }
@@ -37,9 +42,11 @@
         .chat-input-area input { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: #1e293b; color: #fff; outline: none; }
 
         /* Giao diện Quản trị ẩn/hiện */
-        #adminView { display: none; background: var(--bg-secondary); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); width: 100%; max-width: 600px; margin-top: 20px; }
+        #adminView { display: none; background: var(--bg-secondary); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); width: 100%; max-width: 700px; margin-top: 20px; }
         #adminView h2 { margin-bottom: 15px; font-size: 20px; }
-        #adminView input { width: 100%; padding: 12px; margin-top: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: #1e293b; color: #fff; outline: none; }
+        #adminView input { width: 100%; padding: 12px; margin-top: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid var(--border-color); background: #1e293b; color: #fff; outline: none; }
+        
+        .admin-item { display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 12px; border-radius: 6px; margin-bottom: 10px; border: 1px solid var(--border-color); }
 
         /* Nút Quản trị ở góc phải */
         .admin-trigger { position: fixed; bottom: 10px; right: 10px; color: var(--text-muted); font-size: 12px; text-decoration: none; background: var(--bg-secondary); padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); cursor: pointer; }
@@ -52,21 +59,8 @@
     <div id="homeView" class="container">
         <h1 class="section-title">🚀 Danh Sách Bài Mô Phỏng</h1>
         
-        <div class="card">
-            <div class="card-info">
-                <h3>Hệ mặt trời</h3>
-                <p>Mô phỏng hệ mặt trời 3D</p>
-            </div>
-            <a href="#" class="btn">Truy cập ngay</a>
-        </div>
-
-        <div class="card">
-            <div class="card-info">
-                <h3>Hóa Học</h3>
-                <p>Thí nghiệm hóa học ảo</p>
-            </div>
-            <a href="#" class="btn">Truy cập ngay</a>
-        </div>
+        <!-- Danh sách bài học sẽ được render tự động ở đây -->
+        <div id="simListContainer"></div>
 
         <!-- KHUNG CHAT AI -->
         <div class="ai-chat-box">
@@ -84,17 +78,20 @@
     <!-- PHẦN TRANG QUẢN TRỊ (ẨN LÚC ĐẦU) -->
     <div id="adminView">
         <h2>🚀 Trang Quản Trị Bài Mô Phỏng</h2>
-        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">Quản lý và thêm mới bài học vào danh sách.</p>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">Thêm mới hoặc xóa bớt các bài mô phỏng.</p>
         
         <label>Tên bài mô phỏng:</label>
         <input type="text" id="simName" placeholder="Ví dụ: Vật Lý - Con Lắc Đơn">
         
-        <label style="margin-top: 15px; display: block;">Đường dẫn (Link):</label>
+        <label>Đường dẫn (Link):</label>
         <input type="text" id="simLink" placeholder="Ví dụ: vat-ly.html">
         
-        <button class="btn" style="width: 100%; margin-top: 15px;" onclick="alert('Đã lưu thông tin thành công!')">Lưu bài học</button>
+        <button class="btn" style="width: 100%;" onclick="addSimulation()">Thêm bài học mới</button>
+
+        <h3 style="margin-top: 25px; margin-bottom: 15px; font-size: 16px;">Danh sách bài hiện có:</h3>
+        <div id="adminListContainer"></div>
         
-        <br><br>
+        <br>
         <a href="#" onclick="showHome(event)" style="color: var(--text-muted); text-decoration: none; font-size: 14px;">← Quay lại trang chủ học sinh</a>
     </div>
 
@@ -102,62 +99,73 @@
     <a class="admin-trigger" onclick="showAdmin(event)">⚙️ Quản Trị</a>
 
     <script>
-        function showAdmin(e) {
-            e.preventDefault();
-            document.getElementById('homeView').style.display = 'none';
-            document.getElementById('adminView').style.display = 'block';
+        const ADMIN_PASSWORD = "682010@?"; // Mật khẩu quản trị viên
+
+        // Dữ liệu mẫu ban đầu (sẽ lưu vào trình duyệt)
+        let simulations = JSON.parse(localStorage.getItem('simulations')) || [
+            { name: "Hệ mặt trời", desc: "Mô phỏng hệ mặt trời 3D", link: "#" },
+            { name: "Hóa Học", desc: "Thí nghiệm hóa học ảo", link: "#" }
+        ];
+
+        function renderSimulations() {
+            // Render trang chủ
+            const homeContainer = document.getElementById('simListContainer');
+            homeContainer.innerHTML = '';
+            simulations.forEach(sim => {
+                homeContainer.innerHTML += `
+                    <div class="card">
+                        <div class="card-info">
+                            <h3>${sim.name}</h3>
+                            <p>${sim.desc}</p>
+                        </div>
+                        <a href="${sim.link}" class="btn">Truy cập ngay</a>
+                    </div>
+                `;
+            });
+
+            // Render trang quản trị (kèm nút Xóa)
+            const adminContainer = document.getElementById('adminListContainer');
+            adminContainer.innerHTML = '';
+            simulations.forEach((sim, index) => {
+                adminContainer.innerHTML += `
+                    <div class="admin-item">
+                        <span><b>${sim.name}</b></span>
+                        <button class="btn btn-danger" onclick="deleteSimulation(${index})">Xóa</button>
+                    </div>
+                `;
+            });
         }
 
-        function showHome(e) {
-            e.preventDefault();
-            document.getElementById('adminView').style.display = 'none';
-            document.getElementById('homeView').style.display = 'block';
-        }
+        function addSimulation() {
+            const name = document.getElementById('simName').value.trim();
+            const link = document.getElementById('simLink').value.trim();
 
-        function handleKeyPress(e) {
-            if (e.key === 'Enter') sendMessage();
-        }
-
-        async function sendMessage() {
-            const inputField = document.getElementById('userInput');
-            const messageContainer = document.getElementById('chatMessages');
-            const userText = inputField.value.trim();
-
-            if (!userText) return;
-
-            messageContainer.innerHTML += `<div class="message user-msg">${userText}</div>`;
-            inputField.value = '';
-            messageContainer.scrollTop = messageContainer.scrollHeight;
-
-            const loadingId = 'loading_' + Date.now();
-            messageContainer.innerHTML += `<div class="message ai-msg" id="${loadingId}">AI đang suy nghĩ...</div>`;
-            messageContainer.scrollTop = messageContainer.scrollHeight;
-
-            try {
-                // Gọi API backend bảo mật trên Vercel (/api/chat)
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: userText })
-                });
-
-                const data = await response.json();
-                document.getElementById(loadingId).remove();
-                messageContainer.innerHTML += `<div class="message ai-msg">${data.reply || data.error}</div>`;
-            } catch (error) {
-                document.getElementById(loadingId).remove();
-                messageContainer.innerHTML += `<div class="message ai-msg">Lỗi kết nối tới server!</div>`;
+            if (!name || !link) {
+                alert("Vui lòng nhập đầy đủ tên và đường dẫn!");
+                return;
             }
 
-            messageContainer.scrollTop = messageContainer.scrollHeight;
+            simulations.push({ name: name, desc: "Bài mô phỏng tùy chỉnh", link: link });
+            localStorage.setItem('simulations', JSON.stringify(simulations));
+            
+            document.getElementById('simName').value = '';
+            document.getElementById('simLink').value = '';
+            
+            renderSimulations();
+            alert("Thêm bài học thành công!");
         }
-        // Đặt mật khẩu quản trị viên của bạn ở đây
-        const ADMIN_PASSWORD = "682010@?"; // Bạn có thể thay đổi mật khẩu tùy ý
+
+        function deleteSimulation(index) {
+            if (confirm("Bạn có chắc chắn muốn xóa bài mô phỏng này không?")) {
+                simulations.splice(index, 1);
+                localStorage.setItem('simulations', JSON.stringify(simulations));
+                renderSimulations();
+            }
+        }
 
         function showAdmin(e) {
             e.preventDefault();
             const password = prompt("Nhập mật khẩu quản trị viên:");
-            
             if (password === ADMIN_PASSWORD) {
                 document.getElementById('homeView').style.display = 'none';
                 document.getElementById('adminView').style.display = 'block';
@@ -208,6 +216,9 @@
 
             messageContainer.scrollTop = messageContainer.scrollHeight;
         }
+
+        // Tải danh sách khi mở trang
+        renderSimulations();
     </script>
 </body>
 </html>
